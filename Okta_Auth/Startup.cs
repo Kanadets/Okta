@@ -29,6 +29,19 @@ namespace Okta_Auth
         {
             services.AddRazorPages();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder =>
+                {
+                    builder
+                    .WithOrigins("https://localhost:3000")
+                    .AllowCredentials()
+                    //.AllowAnyHeader()
+                    .WithHeaders("Access-Control-Allow-Headers", "Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization", "Access-Control-Allow-Headers")
+                    .AllowAnyMethod();
+                });
+            });
+
             services.Configure<Saml2Configuration>(Configuration.GetSection("Saml2"));
 
             services.Configure<Saml2Configuration>(saml2Configuration =>
@@ -69,6 +82,8 @@ namespace Okta_Auth
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseSaml2();
 

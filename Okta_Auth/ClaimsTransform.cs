@@ -38,7 +38,7 @@ namespace Okta_Auth.Identity
         {
             yield return GetClaim(principal, Saml2ClaimTypes.NameId);
             yield return GetClaim(principal, Saml2ClaimTypes.NameIdFormat);
-            yield return GetClaim(principal, Saml2ClaimTypes.SessionIndex);
+            yield return GetClaim(principal, Saml2ClaimTypes.SessionIndex);         
         }
 
         private static Claim GetClaim(ClaimsPrincipal principal, string claimType)

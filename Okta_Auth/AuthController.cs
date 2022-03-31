@@ -8,11 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Security.Authentication;
 using Okta_Auth.Identity;
+using Microsoft.AspNetCore.Cors;
+using System.Text.Json;
+using System.Security.Claims;
+using ITfoxtec.Identity.Saml2.Claims;
+using Okta_Auth.Pages;
+using System.Net;
+using System.IO;
 
 namespace Okta_Auth.Controllers
 {
     [AllowAnonymous]
     [Route("Auth")]
+    [EnableCors("CorsPolicy")]
     public class AuthController : Controller
     {
         const string relayStateReturnUrl = "ReturnUrl";
@@ -48,7 +56,28 @@ namespace Okta_Auth.Controllers
 
             var relayStateQuery = binding.GetRelayStateQuery();
             var returnUrl = relayStateQuery.ContainsKey(relayStateReturnUrl) ? relayStateQuery[relayStateReturnUrl] : Url.Content("~/");
-            return Redirect("https://localhost:3000");
+            return Redirect("https://localhost:3000/login");
+        }
+
+        [Route("whoami")]
+        public async Task<IActionResult> WhoAmI()
+        {
+            //User.Identity
+            //JsonSerializer.Serialize(
+
+            WebRequest request = WebRequest.Create($"https://dev-98677186.okta.com/api/v1/users/{User.Identity.Name}");
+
+            request.Headers.Add("Authorization", "SSWS 006y2BxwmonOCq0DppI_J6NUD9f01e6XZj8LYIFCBy");
+            request.ContentType = "application/json; charset=utf-8";
+
+            var response = await request.GetResponseAsync();
+
+            using var reader = new StreamReader(response.GetResponseStream());
+
+            var data = reader.ReadToEnd(); 
+
+            if (User.Identity.IsAuthenticated) return Ok(data);
+            else return Unauthorized("PASHEL NAHUI");
         }
 
         [HttpPost("Logout")]
